@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-param" content="_csrf-myap">
+    <meta name="csrf-token" content="token_value">
+    <title>Davlat xizmatlari yagona portali</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap another_wrap">
+    <nav class="navbar">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">
+                <img src="logo.svg" alt="Logo">
+            </a>
+        </div>
+        <ul class="navbar-nav">
+            <li><a href="/">Bosh sahifa</a></li>
+            <li><a href="/uz">O'zbekcha</a></li>
+            <li><a href="/ru">Русский</a></li>
+            <li><a href="/login">Kirish</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="info-box">
+            <p class="alert">Iltimos, avtorizatsiyadan o‘ting. PIN kodni kiritishingiz shart emas. <a href="/login">Kirish</a></p>
+            <h3>Hujjatni ko'rish uchun PIN kodni kiriting</h3>
+            <form action="verify.php" method="post" class="pin-form">
+                <label for="pin_code">PIN kod</label>
+                <input type="text" id="pin_code" name="pin_code" required maxlength="4" placeholder="1234">
+                <button type="submit">Ochish</button>
+            </form>
+        </div>
+        <div class="qr-info">
+            <img src="pin_code_document.jpg" alt="Hujjatning PIN kodi">
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2024 UZINFOCOM</p>
+    <p>Sayt <a href="http://www.yiiframework.com/" target="_blank">Yii Framework</a>da ishlaydi.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
